@@ -292,7 +292,7 @@
             },
             {
               "name": "token",
-              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+              "value": "87d7ebcb-3426-433d-b4de-9d1e9d5a0bd3"
             },
             {
               "name": "Content-Type",
@@ -549,7 +549,7 @@
             },
             {
               "name": "token",
-              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+              "value": "87d7ebcb-3426-433d-b4de-9d1e9d5a0bd3"
             },
             {
               "name": "Content-Type",
@@ -647,7 +647,7 @@
             },
             {
               "name": "token",
-              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+              "value": "87d7ebcb-3426-433d-b4de-9d1e9d5a0bd3"
             },
             {
               "name": "Content-Type",
@@ -692,7 +692,7 @@
             },
             {
               "name": "token",
-              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+              "value": "87d7ebcb-3426-433d-b4de-9d1e9d5a0bd3"
             },
             {
               "name": "Content-Type",
@@ -1209,7 +1209,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "fafced1b-1449-4c8b-a198-e8809ecdb2e3",
+  "versionId": "d4a60c43-784c-4d7d-b999-82365495f360",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ceb80fbf5461aaec8ed9018074f738ad87de8b3ef6f2b32135a150fd9121aba8"
