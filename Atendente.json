@@ -1,0 +1,1219 @@
+{
+  "name": "Atendente",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "801390c0-cb51-4532-9f44-26e7233421b9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -656
+      ],
+      "id": "fa921a4f-e591-4875-ab27-9339d235988e",
+      "name": "Webhook",
+      "webhookId": "801390c0-cb51-4532-9f44-26e7233421b9"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1936,
+        -656
+      ],
+      "id": "1229819a-8e6d-4581-9b5b-a564ed0516da",
+      "name": "Wait",
+      "webhookId": "bb520488-16e5-424a-841a-3e803b903e93"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "a48f87c3-bd5a-4713-beda-d120144fc16a"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.message.chatid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3520,
+        -1408
+      ],
+      "id": "207203e7-d6fc-47fc-aa68-8cacab9df19a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2832,
+        -432
+      ],
+      "id": "da4835ed-03d3-4af7-985b-4f2038413702",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "hEWugVWr4roYKjhG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.chat.wa_lastMessageType }}",
+                    "rightValue": "=AudioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "53bf9a45-6027-4fb1-b8a4-f3cf87243a13"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "01a3bf3a-7d50-41d3-97f1-888b28a384b1",
+                    "leftValue": "={{ $json.body.chat.wa_lastMessageType }}",
+                    "rightValue": "ExtendedTextMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9311f05b-96ba-48ac-aaf1-bf37da47a8b5",
+                    "leftValue": "={{ $json.body.chat.wa_lastMessageType }}",
+                    "rightValue": "VideoMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        -672
+      ],
+      "id": "51a996d1-9400-4935-9c30-1cf34adf8613",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8094c1aa-7f0d-49ea-b975-496a26f27a67",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "###SOLICITAR_HUMANO###",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3296,
+        -1440
+      ],
+      "id": "5741e081-e0c5-424e-b09e-e641759f05a6",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "s7sxOMoW5qP7zvJC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/s7sxOMoW5qP7zvJC",
+          "cachedResultName": "My Sub-Workflow 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3520,
+        -1584
+      ],
+      "id": "da105c97-a90c-40e5-8f8a-1cb2badf927b",
+      "name": "Call 'My Sub-Workflow 1'"
+    },
+    {
+      "parameters": {
+        "description": "Use esta ferramenta APENAS quando o cliente quiser realizar o pagamento, fechar a compra ou exigir falar com um atendente humano. ",
+        "workflowId": {
+          "__rl": true,
+          "value": "s7sxOMoW5qP7zvJC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/s7sxOMoW5qP7zvJC",
+          "cachedResultName": "My Sub-Workflow 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3136,
+        -1536
+      ],
+      "id": "06783c75-f796-4447-bc6c-89612b49259e",
+      "name": "Call 'Venda'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/message/download",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"messageid\"] }}"
+            },
+            {
+              "name": "generate_mp3",
+              "value": "={{ true }}"
+            },
+            {
+              "name": "return_link",
+              "value": "={{ true }}"
+            },
+            {
+              "name": "transcribe",
+              "value": "={{ true }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        -848
+      ],
+      "id": "df633dd2-a052-4eb8-a438-bde600b20a7e",
+      "name": "Baixar Mídia UAZAP"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        -848
+      ],
+      "id": "25bee511-19a1-4d52-bf52-3c17cae85f91",
+      "name": "Enviar para OpenAI Whisper"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "pt"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        816,
+        -848
+      ],
+      "id": "601a9722-f782-4858-af55-980e417dfc3f",
+      "name": "Transcrever Áudio",
+      "credentials": {
+        "openAiApi": {
+          "id": "hEWugVWr4roYKjhG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Webhook').item.json.body.message.chatid }}",
+        "messageData": "={{ $json.text || $('Webhook').item.json.body.message.text }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -656
+      ],
+      "id": "b99629c2-3915-415e-847a-5620a95073fa",
+      "name": "Histórico: Salvar Mensagem",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e7a31973-2e23-4daf-b98f-62187de08b8b",
+              "leftValue": "={{ $('Verificar se tem mais mensagem ou não').item.json.id_gravado }}",
+              "rightValue": "={{ $execution.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2384,
+        -656
+      ],
+      "id": "44b87e1b-9005-4da9-bfda-4bbaca784306",
+      "name": "Bot está Liberado?"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "nomeCliente",
+        "key": "={{ $('Webhook').item.json.body.message.chatid }}-nome",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        -656
+      ],
+      "id": "9d0ef097-c95f-40f1-8f9c-a8c997af1df9",
+      "name": "Recuperar Nome do Cliente",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{\n  $if($('Transcrever Áudio').isExecuted,\n    $('Transcrever Áudio').item.json.text,\n    $if($('Transcrever Vídeo').isExecuted,\n      $('Transcrever Vídeo').item.json.text,\n      $('Webhook').item.json.body.message.text\n    )\n  )\n}}",
+        "options": {
+          "systemMessage": "=Vitor, como você está na correria e precisa que isso funcione de primeira no n8n, aqui está o prompt ajustado.\n\nO segredo aqui é transformar o código em uma ordem condicional. Se você deixar o código solto no fim do texto, a IA vai mandar ele em todo \"Bom dia\", o que vai travar seu fluxo.\n\nCopie e cole exatamente isto no seu System Message:\n\n📝 System Prompt Ajustado\nVocê é o Vitor, vendedor da nossa loja de carros em Araguari. Seja muito gente boa e educado. Use as informações fornecidas para personalizar o atendimento. O nome do cliente é: {{ $node[\"Recuperar Nome do Cliente\"].json[\"nomeCliente\"] }}.\n\nDIRETRIZES DE ATENDIMENTO:\n\nConsulta Obrigatória: Sempre que o cliente perguntar sobre preços, modelos, valor ou estoque, você OBRIGATORIAMENTE deve usar a ferramenta de consulta de carros antes de responder.\n\nFase de Credenciamento: Entenda as necessidades, se há carro na troca e a faixa de preço desejada.\n\nFase de Negociação: Ofereça opções do estoque e foque em agendar a visita (use a ferramenta de agendamento).\n\nFase de Fechamento (TRANSFERÊNCIA): Se o cliente demonstrar intenção clara de fechar negócio (ex: \"quero comprar\", \"vou levar\", \"como eu pago\" ou \"me passa o PIX\"), você deve:\n\nInformar que o Gerente Financeiro assumirá o atendimento para finalizar o contrato e o pagamento.\n\nIMEDIATAMENTE após sua mensagem, escreva o código de ativação na última linha: ###SOLICITAR_HUMANO### ID:{{ $('Webhook').item.json.body.message.chatid }}\n\nRESTRIÇÕES CRÍTICAS:\n\nVocê NUNCA processa pagamentos, não gera links de PIX e não fecha contratos.\n\nNão invente dados; se a ferramenta de consulta não retornar um carro, informe que verificará com o estoque físico.\n\nREGRA DE FINALIZAÇÃO:\nSe o cliente demonstrar intenção clara de realizar o pagamento, fechar a compra ou finalizar o processo (ex: \"quero pagar\", \"me manda o PIX\", \"fechado\"), você deve:\n\nInterromper imediatamente qualquer outra explicação.\n\nResponder exclusivamente com a frase: \"Tudo bem! Um atendente estará entrando em contato com você.\"\n\nNão adicione nenhuma outra palavra, emoji ou pergunta após essa frase."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2896,
+        -656
+      ],
+      "id": "21268764-3b10-4eb4-866f-9088db8c0515",
+      "name": "Cérebro: Vendedor Vitor"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.message.chatid }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2960,
+        -432
+      ],
+      "id": "551500b0-e0f8-4360-a39e-7cba9116c74d",
+      "name": "Memória de Curto Prazo"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta ferramenta para consultar o estoque de carros disponíveis na loja. Contém informações sobre modelo, ano, preço, quilometragem e descrição dos veículos.",
+        "documentId": {
+          "__rl": true,
+          "value": "1udOMeEoCZwKP3oZAB51UXrsFCeuq_zQFLlNtLM32azg",
+          "mode": "list",
+          "cachedResultName": "Planilha sem título",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1udOMeEoCZwKP3oZAB51UXrsFCeuq_zQFLlNtLM32azg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1udOMeEoCZwKP3oZAB51UXrsFCeuq_zQFLlNtLM32azg/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        3088,
+        -432
+      ],
+      "id": "8c480628-1415-4ca9-8920-d4578511471e",
+      "name": "Consultar Estoque (Planilha)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pMBkhmf16x3JM0bY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.message.chatid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3280,
+        -656
+      ],
+      "id": "df456ddc-90e5-42be-aab0-10be683a8447",
+      "name": "Enviar Resposta"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -1216
+      ],
+      "id": "43271975-b1d7-4d64-a02a-94c8056edf90",
+      "name": "Limpeza Diária"
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "*:last_interaction"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -1216
+      ],
+      "id": "29079daf-a0dd-4b56-ba84-02e07e677934",
+      "name": "Buscar Chaves Expiradas",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const dados = $input.first().json;\nconst clientes_separados = [];\n\nfor (const chave in dados) {\n  clientes_separados.push({\n    json: {\n      numero_cliente: chave, \n      timestamp_gravado: dados[chave] \n    }\n  });\n}\n\nreturn clientes_separados;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -1216
+      ],
+      "id": "084fd4d8-e477-4425-a3f0-dce59fb8cd6b",
+      "name": "Lógica de Expiração"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.numero_cliente.split(':')[0] }}"
+            },
+            {
+              "name": "text",
+              "value": "=Oi! Vi que não terminamos nossa conversa sobre os carros. Ficou alguma dúvida que eu possa ajudar?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        -1232
+      ],
+      "id": "5935b3b7-fc46-4e49-8159-830a898f7ff8",
+      "name": "Notificar Limpeza"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/message/download",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "497f473a-9537-43fe-bcca-9c015d1b3fea"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"messageid\"] }}"
+            },
+            {
+              "name": "return_link",
+              "value": "={{ true }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        -656
+      ],
+      "id": "82209ba0-3dc6-4d45-b75c-fd601b1daafe",
+      "name": "Baixar Vídeo"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        -656
+      ],
+      "id": "beaff82c-407b-49a5-a70d-dc46cd125a21",
+      "name": "Enviar para OpenAI"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "pt"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        816,
+        -656
+      ],
+      "id": "758f68f0-e619-4493-be18-91e0dba80c38",
+      "name": "Transcrever Vídeo",
+      "credentials": {
+        "openAiApi": {
+          "id": "hEWugVWr4roYKjhG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Webhook').item.json.body.message.chatid }}:last_interaction",
+        "value": "={{ $now.toMillis() }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -656
+      ],
+      "id": "f54b718a-d5ae-4acc-ac81-c67f0fc18f4c",
+      "name": "Etiqueta da Conversa",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Webhook').item.json.body.message.chatid }}:debounce",
+        "value": "={{ $execution.id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        -656
+      ],
+      "id": "c0d7e942-3865-4a87-8e73-a33380f7a568",
+      "name": "Controle",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "id_gravado",
+        "key": "={{ $('Webhook').item.json.body.message.chatid }}:debounce",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -656
+      ],
+      "id": "11098df5-24bf-4ed6-ba58-15f468141e60",
+      "name": "Verificar se tem mais mensagem ou não",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d1415cc1-37d6-4c88-b862-211f6588108c",
+              "leftValue": "={{ $now.toMillis() - $json.timestamp_gravado }}",
+              "rightValue": 60000,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        -1216
+      ],
+      "id": "de633612-535c-425e-8684-013c971f5778",
+      "name": "Mandar mensagem"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Webhook').item.json.body.message.chatid }}-nome",
+        "value": "={{ $('Webhook').item.json.body.chat.wa_name }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        -656
+      ],
+      "id": "6a741b45-e833-43ea-b418-e88a3433db6f",
+      "name": "Capturar nome do cliente",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Verificar se tem mais mensagem ou não",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Cérebro: Vendedor Vitor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Baixar Mídia UAZAP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Histórico: Salvar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Baixar Vídeo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Call 'My Sub-Workflow 1'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Venda'": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Baixar Mídia UAZAP": {
+      "main": [
+        [
+          {
+            "node": "Enviar para OpenAI Whisper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar para OpenAI Whisper": {
+      "main": [
+        [
+          {
+            "node": "Transcrever Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcrever Áudio": {
+      "main": [
+        [
+          {
+            "node": "Histórico: Salvar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Histórico: Salvar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Etiqueta da Conversa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bot está Liberado?": {
+      "main": [
+        [
+          {
+            "node": "Recuperar Nome do Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperar Nome do Cliente": {
+      "main": [
+        [
+          {
+            "node": "Cérebro: Vendedor Vitor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cérebro: Vendedor Vitor": {
+      "main": [
+        [
+          {
+            "node": "Enviar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória de Curto Prazo": {
+      "ai_memory": [
+        [
+          {
+            "node": "Cérebro: Vendedor Vitor",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Estoque (Planilha)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cérebro: Vendedor Vitor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpeza Diária": {
+      "main": [
+        [
+          {
+            "node": "Buscar Chaves Expiradas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Chaves Expiradas": {
+      "main": [
+        [
+          {
+            "node": "Lógica de Expiração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lógica de Expiração": {
+      "main": [
+        [
+          {
+            "node": "Mandar mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baixar Vídeo": {
+      "main": [
+        [
+          {
+            "node": "Enviar para OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar para OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Transcrever Vídeo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcrever Vídeo": {
+      "main": [
+        [
+          {
+            "node": "Histórico: Salvar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etiqueta da Conversa": {
+      "main": [
+        [
+          {
+            "node": "Capturar nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Controle": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar se tem mais mensagem ou não": {
+      "main": [
+        [
+          {
+            "node": "Bot está Liberado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mandar mensagem": {
+      "main": [
+        [
+          {
+            "node": "Notificar Limpeza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capturar nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Controle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "fafced1b-1449-4c8b-a198-e8809ecdb2e3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ceb80fbf5461aaec8ed9018074f738ad87de8b3ef6f2b32135a150fd9121aba8"
+  },
+  "id": "tWQ2So7aPBExxJ4He8ZXU",
+  "tags": []
+}

@@ -1,0 +1,130 @@
+{
+  "name": "Pagamento",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $json.chatid.split(':')[0] }}:atendimento_humano",
+        "value": "true"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        480,
+        352
+      ],
+      "id": "0cd6feeb-e83d-4724-883b-68825ff046f8",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "xDA7Sdvawv5KbvN0",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://free.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "a48f87c3-bd5a-4713-beda-d120144fc16a"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "=5534992449395"
+            },
+            {
+              "name": "text",
+              "value": "=🚨 *FECHAMENTO À VISTA!* 🚨Vitor, o cliente do número {{ $json.chatid.split(':')[0] }} quer finalizar a compra ou falar com você.\\n\\nO bot já foi silenciado. Assume aí! 🏎️💨"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        352
+      ],
+      "id": "e29b4f1c-f84c-456c-8c8f-2ba2dc8e7342",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e8fcc8b2-b7b1-4281-bd81-13ec34d9ce84",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ceb80fbf5461aaec8ed9018074f738ad87de8b3ef6f2b32135a150fd9121aba8"
+  },
+  "id": "s7sxOMoW5qP7zvJC",
+  "tags": []
+}
